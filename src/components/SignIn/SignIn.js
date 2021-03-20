@@ -27,7 +27,6 @@ class SignIn extends React.Component {
             })
         })
         .then(res => {
-            console.log('res: ', res);
             if(res.status === 400){
                 alert('wrong credentials'); 
             }
