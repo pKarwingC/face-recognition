@@ -23,7 +23,7 @@ class Register extends React.Component {
     }
 
     onSubmitSignIn = () => {
-        fetch('http://localhost:3000/register', {
+        fetch('https://guarded-chamber-46165.herokuapp.com/register', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -33,12 +33,16 @@ class Register extends React.Component {
             })
         })
         .then(response => response.json())
-        .then(user => {
-            if (user) {
-                this.props.loadUser(user);
+        .then(data => {
+            if (data && data.id) {
+                this.props.loadUser(data);
                 this.props.onRouteChange('home');
             }
-        });
+            else{
+                alert(data);
+            }
+        })
+        .catch(console.log);
     }
 
     render() {
