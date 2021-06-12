@@ -13,7 +13,7 @@ const FaceRecognition = ({box, imageUrl})=> {
         );
     }else{
         return (
-            <></>
+            <div></div>
         );
     }
 };
