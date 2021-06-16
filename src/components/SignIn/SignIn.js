@@ -17,6 +17,10 @@ class SignIn extends React.Component {
         this.setState({signInPassword: event.target.value});
     }
 
+    saveAuthTokenInSession = (token)=>{
+        window.localStorage.setItem('token', token);
+    }
+
     onSubmitSignIn = () => {
         // fetch('https://guarded-chamber-46165.herokuapp.com/signin',{
         fetch('http://localhost:3000/signin',{
@@ -33,9 +37,10 @@ class SignIn extends React.Component {
             }
             return res.json();
         })
-        .then(user => {
-            if(user && user.id){
-                this.props.loadUser(user);
+        .then(data => {
+            if(data && data.success === true){
+                this.saveAuthTokenInSession(data.token);
+                this.props.loadUser(data);
                 this.props.onRouteChange('home');
             };
         });

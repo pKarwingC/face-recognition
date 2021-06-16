@@ -17,3 +17,8 @@ code {
 button {
   cursor: pointer;
 }
+
+#modal-root {
+  position: relative;
+  z-index: 999;
+}

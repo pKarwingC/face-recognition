@@ -7,6 +7,8 @@ import Rank from './components/Rank/Rank';
 import SignIn from './components/SignIn/SignIn';
 import Register from './components/Register/Register';
 import './App.css';
+import Modal from './components/Modal/Modal';
+import Profile from './components/Profile/Profile';
 
 class App extends Component {
   constructor(){
@@ -16,6 +18,7 @@ class App extends Component {
       imageUrl: '',
       box: {},
       isSignedIn: false,
+      isProfileOpen: false,
       route: 'signin',
       user: {
         id: '',
@@ -26,6 +29,53 @@ class App extends Component {
         joined: ''
       }
     };
+  }
+
+  componentDidMount(){
+    const token = window.localStorage.getItem('token');
+    if(token){
+      console.log('token: ',token)
+      fetch('http://localhost:3000/signin',{
+        method: 'post',
+        headers:{
+          'Content-Type': 'application/json',
+          'Authorization': token
+        }
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        console.log('data: ',data)
+        if(data && data.id){
+          fetch(`http://localhost:3000/profile/${data.id}`,{
+            method: 'get',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': token
+            }
+          })
+          .then(resp => resp.json())
+          .then(resp =>{
+            fetch(`http://localhost:3000/profile/${resp.id}`,{
+              method: 'get',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+              }
+            })
+            .then(resp => resp.json())
+            .then(user => {
+              if(user && user.email){
+                this.loadUser(user);
+                this.onRouteChange('home');
+              }
+            })
+            .catch(err => console.log(err))
+          })
+          .catch(err => console.log(err))
+        }
+      })
+      .catch(err => console.log(err));
+    }
   }
 
   loadUser = (data)=> {
@@ -104,11 +154,26 @@ class App extends Component {
     this.setState({route: route});
   }
 
+  toggleModal = () => {
+    this.setState(previousState => ({
+      isProfileOpen: !previousState.isProfileOpen
+    }));
+  }
+
   render(){
-    const { isSignedIn, imageUrl, route, box } = this.state;
+    const { isSignedIn, isProfileOpen, imageUrl, route, box, user } = this.state;
     return (
       <div className="App">
-        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
+        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} toggleModal={this.toggleModal} />
+        { isProfileOpen && 
+          <Modal>
+            <Profile isProfileOpen={isProfileOpen} 
+              toggleModal={this.toggleModal} 
+              user={user}
+              loadUser={this.loadUser}>
+              { 'hello world' }
+            </Profile>
+          </Modal>}
         { route === 'home'
           ? <div>
               <Logo />
